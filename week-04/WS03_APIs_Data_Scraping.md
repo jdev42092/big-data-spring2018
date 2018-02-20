@@ -54,7 +54,7 @@ import json
 import time
 import threading
 from datetime import datetime
-from twython import Twython
+import tweepy
 
 # Imports the keys from the python file
 from twitter_key import api_key, api_secret
@@ -96,7 +96,7 @@ Next, let's do a search and get some tweets! Specifically, set up a function tha
 
 The **Search API** can take many parameters for querying tweets. Twitter has a nice page of what you can use as query parameters here [https://dev.twitter.com/rest/public/search](https://dev.twitter.com/rest/public/search).
 
-The Twitter API has rate limits that limit how quickly you can download data. This is to try to lighten the load on their servers. We are using the Search API with **OAuth2 (Application) Access** - which limits us to **450 in 15 minutes** Read about the [Rate Limits](https://dev.twitter.com/rest/public/rate-limiting) here. This means, in our following steps, always follow the guideline that you will not be able to get more than 450 tweets in 15 minutes, or Twitter might lock your access.
+The Twitter API has rate limits that limit how quickly you can download data. This is to try to lighten the load on their servers. We are using the Search API with **OAuth2 (Application) Access** - which limits us to **450 in 15 minutes** Read about the [Rate Limits](https://dev.twitter.com/rest/public/rate-limiting) here. This means, in our following steps, always follow the guideline that you will not be able to get more than 450 tweets in 15 minutes, or Twitter might lock your access. Rate limits are the wooooooorst.
 
 
 ```python
@@ -338,29 +338,3 @@ Exporting your dataset is easy, you can use **to_csv()**. This [Stack Exchange](
 ```python
 df_tweets.to_csv('twitter_data.csv', sep=',', encoding='utf-8')
 ```
-
-### Problem Set 3 - Extend What You Have Learned
-
-Now that you know how to scrape data from Twitter, let's extend the exercise a little so you can show us what you know. This time you will set up the scraper to get data around MIT and scrape data for 20 minutes. Then you will visualize it with  and visualize. Think about what you would need to change to do that.
-
-Once you have the new JSON file of Boston tweets you should a pie chart and scatterplot of your collected tweets. When you are creating your dataset, you should get at least two different attributes returned by the Twitter API (we got many of them above, so base it off of that example). Atleast one of them should be the tweet id. Make sure you remove and duplicate tweets (if any). Expanding on the above, then save the data to a CSV.
-
-Make sure you get your own Twitter Key.
-
-#### Deliverables
-
-**1** - Using the Twitter REST API, collect Tweets from Boston for 30 min. Note how you set the time in the above example (in the **run_all()** function), it was in seconds. How would you do that here?
-
-**2** - Create a Pie Chart showing a summary of tweets by user location. Please clean up the data so that multiple variations of the same location name are replaced with one variation.
-
-**3** - Create a Scatterplot showing all of the tweets that had a latitude and longitude.
-
-**4** - Pick a search term, such as *Trump* or *#Trump* and collect 15 minutes of tweets on it. Use the same lat/lon for Boston as you used above.
-
-**5** - Export the entirety of your scraped Twitter datasets (one with a search term, one without) to two CSV files. We will be checking this CSV file for duplicates. So clean your file.  
-
-### What to Give Us on Stellar
-
-1 - Create a new Jupyter notebook that contains your scraper code. You can copy much of this one, but customize it. Submit the new Jupyter notebook, which includes your pie chart and scatterplot.
-
-2 - Your final CSV files.

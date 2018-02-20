@@ -45,7 +45,7 @@ Github has a particular, and sometimes peculiar, way of speaking about itself an
 	<dd>A branch is a parallel version of a repository. It is contained within the repository, but does not affect the primary (or *master*) branch. This is useful! You can work freely without fear of breaking the "live" version. It's generally good practice to keep your *master* branch clean and working, while you test changes on branches. When you've made the changes you want to make (or have decided to abandon ship), you can either merge your branch back into the master branch or revert to the clean, working master.</dd>
 </dl>
 
-Okay, let's get started with Github, set up our computers to talk to the Github website so we can push and pull files, and let's give this a try!
+Let's get started with Github and set up our computers to talk to the Github website so we can push and pull files!
 
 ## Getting Started on Github
 
