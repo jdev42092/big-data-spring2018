@@ -1,4 +1,4 @@
-7# Introduction to Python
+# Workshop 1: Introduction to Python
 
 ## Starting out
 

@@ -1,6 +1,4 @@
-# Big Data And Society: Lab 2
-
-## Introduction to Pandas
+# Workshop 2: Introduction to Pandas
 
 `Pandas` is a library for Python for data manipulation and analysis. Pandas expands the data processing capacities of Python and adds a number of classes for easily importing data; in particular, it adds numerical tables, from various formats into their DataFrame object. A `DataFrame` is Panda’s basic object that allows multidimensional data processing and indexing. `DataFrames` can be easily and efficiently queried without the need of cumbersome syntax and convoluted loops. `DataFrames` can be merged with other data, they can be sliced, and they can be reshaped. In a way, we can think of Pandas as a combination of Excel and SQL.
 
@@ -53,7 +51,7 @@ http://pandas.pydata.org/pandas-docs/stable/index.html
 
 To start us off, let's look at some aggregated cell phone GPS data from a location services company called Skyhook. This is a Boston extract of Skyhook's OpenTide product, which aggregates individual GPS pings to 100x100 meter points. If you're interested, I scraped this from a CARTO product showcasing Skyhook's OpenTide data using a simple script that I've included in this week's materials (`scripts/skyhook_scrape.py`).
 
-This data is too big to upload uncompressed to GitHub, so I've included it as a ZIP file. Extract this zip file and make sure the resulting file is named `skyhook_2017-07.csv`, located in your `week-03` data folder. We then read in the CSV using the pandas `read_csv` function.
+This data is too big to upload uncompressed to GitHub, so I've included it as a ZIP file. Extract this zip file and make sure the resulting file is named `skyhook_2017-07.csv`, located in your `week-03` data folder. We then read in the CSV using the pandas `read_csv` function and store it in a new Pandas DataFrame that we call `df` (we could, of course, call it anything).
 
 ```python
 # If you started Atom from a directory other than the /week-03 directory, you'll need to change Python's working directory. Uncomment these lines and specify your week-03 path.
@@ -61,7 +59,7 @@ This data is too big to upload uncompressed to GitHub, so I've included it as a 
 # os.chdir('week-03')
 
 # Reading a CSV with Skyhook data
-df = pd.read_csv('week-03/data/skyhook_2017-07.csv', sep=',')
+df = pd.read_csv('data/skyhook_2017-07.csv', sep=',')
 
 # We can print the first 5 rows of the dataframe
 df.head()
@@ -89,7 +87,7 @@ We can determine the shape (i.e., the dimensions) of our DataFrame by accessing 
 df.shape
 ```
 
-1,352,529 rows times 9 columns! Not *huge* data by contemporary standards, but definitely big. `df.shape` returns a `tuple`, so we can access members of this `tuple` like we do with a `list`:
+1,352,529 rows times 10 columns! Not *huge* data by contemporary standards, but definitely big. `df.shape` returns a `tuple`, so we can access members of this `tuple` like we do with a `list`:
 
 ```python
 # Number of rows
@@ -157,7 +155,7 @@ time.head
 time.shape
 ```
 
-We see that we now have a DataFrame containing observations in a single hour, subsetted from our DataFrame containing data for all of July 2017. Using `.shape`, we can see that it contains 10,601 rows.
+We see that we now have a DataFrame containing observations in a single hour, subsetted from our DataFrame containing data for all of July 2017. Using `.shape`, we can see that it contains 12,546 rows.
 
 We can query based on multiple criteria using boolean operators (`&` for `and`, `|` for `or`). All we need to do is add `()` brackets around each condition. The query uses a boolean AND. Each condition creates a mask containing `True` and `False` values.
 
@@ -254,22 +252,23 @@ Get the average number of GPS pings per hour across the whole dataset.
 
 One of the most common tasks while working with big data is data cleaning. Datasets will be inherently heterogeneous and unstructured. The lack of structure can cause functions to throw errors. We can clean data sets through various methods; if the discrepancies follow a structured pattern, it is possible to use built-in functions, or write our own functions. However, if the errors cannot be structured, we might have to do it manually!
 
-You may have noticed something strange about the `hours` column in this dataset---we are reasonably sure that there are only 24 hours in a day, but the `hours` column ranges from 0-167. This is because the data for each day is not terribly tidy; each day includes a small number of observations from the surrounding week. Further complicating the matter, the 168 hours take place over a week that runs from Sunday to Monday, where Sunday is 0-23, Monday is 24-47 etc.
+You may have noticed something strange about the `hours` column in this dataset---we are reasonably sure that there are only 24 hours in a day, but the `hours` column ranges from 0-167. This is because the data for each day is not terribly tidy; each day includes a small number of observations from the surrounding week. Further complicating the matter, the 168 hours take place over a week that runs from Sunday to Monday. Finally, the hours of the week are recorded in Greenwich Mean Time, which means that, while we might expect that Sunday corresponds to hours 0-23, Monday corresponds to hours 24-47 etc., it's slightly more complicated: Sunday runs from 163 - 18, spanning the beginning and end of the `hours` column.
 
 We can visualize this problem by making some simple line graphs of our `count` column.
 
 ```python
 # This line lets us plot in Atom
-import matplotlib as mpl
+import matplotlib
+# This line allows the results of plots to be displayed inline with our code.
 %matplotlib inline
-second = df[df['date'] == '2017-07-02'].groupby('hour')['count'].sum()
-second.plot()
+
+day_hours = df[df['date'] == '2017-07-02'].groupby('hour')['count'].sum()
+day_hours.plot()
 ```
 
-Let's clean the data so that each day contains only those observations that occur during the appropriate day. To do so, we need to first identify which day of the week each calendar day corresponds with. We'll need to convert our `date` column to a `datetime` type that Python can interpret using the `datetime` library. We do this as follows:
+Let's clean the data so that each day contains only those observations that occur during the appropriate day. To do so, we need to first identify which day of the week each calendar day corresponds with. We'll need to convert our `date` column to a `datetime` type that Python can interpret using the Pandas `pd.to_datetime()` function. We do this as follows:
 
 ```python
-import datetime
 df['date_new'] = pd.to_datetime(df['date'], format='%Y-%m-%d')
 ```
 
@@ -291,11 +290,31 @@ df['weekday'].replace(7, 0, inplace = True)
 With this new column, we have everything we need to drop rows that are outside a desired 24-hour time window using a relatively simple for loop:
 
 ```python
+# df[df['date'] == '2017-07-10'].groupby('hour')['count'].sum()
 for i in range(0, 168, 24):
-  df.drop(df[(df['weekday'] == (i/24)) & ( (df['hour'] < date_range[i - 6]) | (df['hour'] >= date_range[i - 6] + 24 )) ].index, inplace = True)
+  j = range(0,168,1)[i - 5]
+  if (j > i):
+    df.drop(df[
+    (df['weekday'] == (i/24)) &
+    (
+    ( (df['hour'] < j) & (df['hour'] > i + 18) ) |
+    ( (df['hour'] > i + 18 ) & (df['hour'] < j) )
+    )
+    ].index, inplace = True)
+  else:
+    df.drop(df[
+    (df['weekday'] == (i/24)) &
+    (
+    (df['hour'] < j) | (df['hour'] > i + 18 )
+    )
+    ].index, inplace = True)
 ```
 
 This looks complicated, but let's break it down. We're running a loop which iterates over a range from 0 to 168, exclusive, using steps of 24. In other words, we're iterating over a week's worth of hours, day-by-day.
+
+But there's a trick. It turns out that these times are logged using Greenwich Mean Time, meaning that Boston is 5 hours behind. This poses a problem when we're dealing with the first day of the week: there are five hours that wrap around the break in the array, occupying elements 163 - 167. If we simply subtract from our `i` value, we'll get negative values; the `hours` column contains no negative values. We therefore create a second range from 0-168 with one-step intervals, which permits us to use those negative numbers to access later elements in the `range`.
+
+We then use a branch to test whether a given day causes the problem of being split over the beginning and end of the range of hours. If our `j` value is greater than our `i` value, we know we have to specify different conditions.
 
 We then use the `.drop()` method to drop rows according to a criteria. We're dropping a row if it's `weekday` is a given value, and its `hour` value is either less than or greater than the window of hours over which that day spans.
 
@@ -305,12 +324,15 @@ Let's see what our dataset looks like after we've performed this cleaning operat
 df.shape
 ```
 
-We lost a some rows, but we're still left with 1,069,177: not too shabby!
+We lost a some rows (on the order of 50,000), but we're still left with 1,320,179... not too shabby!
 
 ## Exporting Data
 
 Let's export our cleaned data file to a CSV! Easy.
 
 ```python
-df.to_csv('data/skyhook_cleaned.csv')
+# If you started Atom from a directory other than the /week-03 directory, you may need to change Python's working directory. Uncomment these lines and specify your week-03 path.
+# import os
+# os.chdir('week-03')
+df.to_csv('week-03/data/skyhook_cleaned.csv')
 ```
