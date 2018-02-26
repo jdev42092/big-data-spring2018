@@ -2,6 +2,14 @@
 
 Now that you know how to scrape data from Twitter, let's extend the exercise a little so you can show us what you know. You will set up the scraper, clean the resulting data, and visualize it. Make sure you get your own Twitter key (AND make sure that you don't accidentally push it to GitHub); careful with your `.gitignore`.
 
+## Graphic Presentation
+
+Make sure to label all your axes and add legends and units (where appropriate)! Think of these graphs as though they were appearing in a published report for an audience unfamiliar with the data.
+
+## Don't Work on Incomplete Data!
+
+One of the dangers of cleaning data is that you inadvertently delete data that is pertinent to your analysis. If you find yourself getting strange results, you can always run previous portions of your script again to rewind your data. See the section called 'reloading your Tweets in the workshop.
+
 ## Deliverables
 
 ### Push to GitHub
@@ -22,7 +30,7 @@ Using the Twitter REST API, collect at least 80,000 tweets. Do not specify a sea
 
 ### Step 2
 
-Clean up the data so that variations of the same user-provided location name are replaced with a single variation. Once you've cleaned up the locations, create a pie chart of user-provided locations.
+Clean up the data so that variations of the same user-provided location name are replaced with a single variation. Once you've cleaned up the locations, create a pie chart of user-provided locations. Your pie chart should strive for legibility! Let the [`matplotlib` documentation](https://matplotlib.org/api/_as_gen/matplotlib.axes.Axes.pie.html) be your guide!
 
 ### Step 3
 
@@ -43,7 +51,6 @@ Create a scatterplot showing all of the tweets that include your search term tha
 ### Step 7
 
 Export your scraped Twitter datasets (one with a search term, one without) to two CSV files. We will be checking this CSV file for duplicates and for consistent location names, so make sure you clean carefully!
-
 
 ## Extra Credit Opportunity
 
