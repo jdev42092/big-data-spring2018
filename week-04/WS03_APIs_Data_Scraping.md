@@ -134,17 +134,17 @@ Note that we set a number of default values in our `get_tweets` function, includ
 
 ```python
 def get_tweets(
-    geo,
-    out_file,
-    search_term = '',
-    tweet_per_query = 100,
-    tweet_max = 150,
-    since_id = None,
-    max_id = -1,
-    write = False
+    geo, ## FOR TWITTER: Allows us to specify location using lat/long/radius
+    out_file, ## LOCAL: specify outfile name and location
+    search_term = '', ## FOR TWITTER: Allows us to input search term (defaults to empty)
+    tweet_per_query = 100, ## FOR TWITTER
+    tweet_max = 150, ## FOR TWITTER
+    since_id = None, ## LOCAL
+    max_id = -1, ## FOR TWITTER: Tells twitter which tweet ID to begin querrying from
+    write = False ## LOCAL
   ):
-  tweet_count = 0
-  # all_tweets = pd.DataFrame()
+  tweet_count = 0 ## Counts number of tweets collected
+  all_tweets = pd.DataFrame()
   while tweet_count < tweet_max:
     try:
       if (max_id <= 0):
@@ -181,7 +181,7 @@ def get_tweets(
         print("No more tweets found")
         break
       for tweet in new_tweets:
-        # all_tweets = all_tweets.append(parse_tweet(tweet), ignore_index = True)
+        all_tweets = all_tweets.append(parse_tweet(tweet), ignore_index = True)
         if write == True:
             with open(out_file, 'w') as f:
                 f.write(jsonpickle.encode(tweet._json, unpicklable=False) + '\n')
@@ -192,7 +192,7 @@ def get_tweets(
       print("Error : " + str(e))
       break
   print (f"Downloaded {tweet_count} tweets.")
-  # return all_tweets
+  return all_tweets
 
 # Set a Lat Lon
 latlng = '42.359416,-71.093993' # Eric's office (ish)
@@ -214,7 +214,7 @@ get_tweets(
 )
 ```
 
-This function will run as is, allowing you to download Tweets to a `.json` file---give it a go! However, we might also want to download it into a more Python-legible format so that we can manipulate it and analyze it.
+This function will run as is, allowing you to download Tweets to a `.json` file---give it a go! Once it's downloaded, we can take a quick look at it using a JSON Viewer. However, we might also want to download it into a more Python-legible format so that we can manipulate it and analyze it.
 
 ## Parsing Our Tweets
 
@@ -253,6 +253,8 @@ tweets = get_tweets(
   write = True,
   out_file = file_name
 )
+
+tweets.head()
 ```
 
 ## Reloading Downloaded Data
@@ -262,7 +264,7 @@ We're about to start cleaning our data; cleaning is not an exact science, and so
 We can always reload our data by running the below command, where `df` is an arbitrary variable name and `path/example_json.json` is the path to, for example, your Tweets:
 
 ```python
-df = pd.read_json('path/example_json.json')
+df = pd.read_json('data/tweets.json')
 ```
 
 ## Let's Explore the Tweets
@@ -353,6 +355,8 @@ You saw above that we had a bunch of locations that were very similar. Here, we 
 ```python
 bos_list = tweets[tweets['location'].str.contains("Boston")]['location']
 tweets['location'].replace(bos_list, 'Boston, MA', inplace = True)
+
+tweets['location'].unique()
 ```
 
 To finish cleaning the data, you would want to iteratively follow a similar process until you've cleaned all locations and made them conform to a single convention.
