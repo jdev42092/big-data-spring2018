@@ -66,7 +66,12 @@ Your first task is to create a bar chart (not a line chart!) of the total count 
 ### Solution
 
 ```python
+df.head()
 
+pings_by_day = df[['count']].groupby(df['date']).sum()
+pings_by_date.rename(index=str, columns = {'count':'pings'}, inplace=True)
+
+pings_by_date.plot(kind = 'bar', color = 'r')
 ```
 
 ## Problem 2: Modify the Hours Column
@@ -78,7 +83,17 @@ After running your code, you should have either a new column in your DataFrame o
 ### Solution
 
 ```python
+df['hour_orig'] = df['hour']
 
+for i in range(0,168,24):
+  j=range(0,168,1)[i-5]  
+  if (j > i):
+    df['hour'].replace(range(i, i + 19, 1), range(5, 24, 1), inplace = True)
+    df['hour'].replace(range(j, j + 5, 1), range(0, 5, 1), inplace = True)
+  else:
+    df['hour'].replace(range(j, i + 19, 1), range(0, 24, 1), inplace = True)
+
+df[df['hour_orig'] == 163]['hour'].value_counts()
 ```
 
 ## Problem 3: Create a Timestamp Column
@@ -88,7 +103,9 @@ Now that you have both a date and a time (stored in a more familiar 24-hour rang
 ### Solution
 
 ```python
-
+df['hour_td'] = pd.to_timedelta(df['hour'], unit = 'h')
+df['timestamp'] = df['date_new'] + df['hour_td']
+df[['date_new','hour_td','timestamp']][:10]
 ```
 
 ## Problem 4: Create Two Line Charts of Activity by Hour
@@ -98,7 +115,12 @@ Create two more graphs. The first should be a **line plot** of **total activity*
 ### Solution
 
 ```python
+ts = df[['count']].groupby(df['timestamp']).sum()
+plt.plot(ts)
 
+
+pings_by_hour = df[['count']].groupby(df['hour']).sum()
+pings_by_hour.plot(kind = 'bar', color = 'g')
 ```
 
 ## Problem 5: Create a Scatter Plot of Shaded by Activity
@@ -106,6 +128,30 @@ Create two more graphs. The first should be a **line plot** of **total activity*
 Pick three times (or time ranges) and use the latitude and longitude to produce scatterplots of each. In each of these scatterplots, the size of the dot should correspond to the number of GPS pings. Find the [Scatterplot documentation here](http://pandas.pydata.org/pandas-docs/version/0.19.1/visualization.html#scatter-plot). You may also want to look into how to specify a pandas Timestamp (e.g., pd.Timestamp) so that you can write a mask that will filter your DataFrame appropriately. Start with the [Timestamp documentation](https://pandas.pydata.org/pandas-docs/stable/timeseries.html#timestamps-vs-time-spans)!
 
 ```python
+# Date Indexing code adapted from stackexchange response by unutbu on 3/31/15 (https://stackoverflow.com/questions/29370057/select-dataframe-rows-between-two-dates)
+date_ind = df.set_index(df['timestamp'])
+
+time0 = date_ind.loc["2017-07-07 01:00:00":"2017-07-07 05:00:00"]
+lab0 = 'July 7, 1:00am - 5:00am'
+time1 = date_ind.loc["2017-07-09 16:00:00":"2017-07-09 20:00:00"]
+lab1 = 'July 9, 4:00pm - 6:00pm'
+time2 = date_ind.loc["2017-07-23 06:00:00":"2017-07-23 10:00:00"]
+lab2 = 'July 23, 6:00am - 10:00am'
+
+fig, ax = plt.subplots(1,3, figsize = (18, 6))
+
+ax[0].scatter(x=time0.lat, y=time0.lon, s=time0['count'], alpha = 0.2)
+ax[0].set_title('July 7, 1:00am - 5:00am')
+ax[0].set_ylim(-71.21,-70.90)
+ax[0].set_xlim(42.20, 42.45)
+ax[1].scatter(x=time1.lat, y=time1.lon, s=time1['count'], alpha = 0.2)
+ax[1].set_title('July 9, 4:00pm - 6:00pm')
+ax[1].set_ylim(-71.21,-70.90)
+ax[1].set_xlim(42.20, 42.45)
+ax[2].scatter(x=time2.lat, y=time2.lon, s=time2['count'], alpha = 0.2)
+ax[2].set_title('July 23, 6:00am - 10:00am')
+ax[2].set_ylim(-71.21,-70.90)
+ax[2].set_xlim(42.20, 42.45)
 
 ```
 
