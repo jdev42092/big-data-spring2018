@@ -68,7 +68,7 @@ Your first task is to create a bar chart (not a line chart!) of the total count 
 ```python
 df.head()
 
-pings_by_day = df[['count']].groupby(df['date']).sum()
+pings_by_date = df[['count']].groupby(df['date']).sum()
 pings_by_date.rename(index=str, columns = {'count':'pings'}, inplace=True)
 
 pings_by_date.plot(kind = 'bar', color = 'r')
@@ -86,14 +86,16 @@ After running your code, you should have either a new column in your DataFrame o
 df['hour_orig'] = df['hour']
 
 for i in range(0,168,24):
-  j=range(0,168,1)[i-5]  
+  j=range(0,168,1)[i-5]
   if (j > i):
-    df['hour'].replace(range(i, i + 19, 1), range(5, 24, 1), inplace = True)
-    df['hour'].replace(range(j, j + 5, 1), range(0, 5, 1), inplace = True)
+    df['hour'].replace(range(j, j + 5, 1), range(-5, 0, 1), inplace = True)
+    df['hour'].replace(range(i, i + 19, 1), range(0, 19, 1), inplace = True)
   else:
-    df['hour'].replace(range(j, i + 19, 1), range(0, 24, 1), inplace = True)
+    df['hour'].replace(range(j, j + 24, 1), range(-5, 19, 1), inplace = True)
 
-df[df['hour_orig'] == 163]['hour'].value_counts()
+
+
+df['hour'].value_counts()
 ```
 
 ## Problem 3: Create a Timestamp Column
@@ -135,7 +137,7 @@ time0 = date_ind.loc["2017-07-07 01:00:00":"2017-07-07 05:00:00"]
 lab0 = 'July 7, 1:00am - 5:00am'
 time1 = date_ind.loc["2017-07-09 16:00:00":"2017-07-09 20:00:00"]
 lab1 = 'July 9, 4:00pm - 6:00pm'
-time2 = date_ind.loc["2017-07-23 06:00:00":"2017-07-23 10:00:00"]
+time2 = date_ind.loc["2017-07-25 16:00:00":"2017-07-25 20:00:00"]
 lab2 = 'July 23, 6:00am - 10:00am'
 
 fig, ax = plt.subplots(1,3, figsize = (18, 6))
@@ -145,11 +147,11 @@ ax[0].set_title('July 7, 1:00am - 5:00am')
 ax[0].set_ylim(-71.21,-70.90)
 ax[0].set_xlim(42.20, 42.45)
 ax[1].scatter(x=time1.lat, y=time1.lon, s=time1['count'], alpha = 0.2)
-ax[1].set_title('July 9, 4:00pm - 6:00pm')
+ax[1].set_title('July 9, 4:00pm - 8:00pm')
 ax[1].set_ylim(-71.21,-70.90)
 ax[1].set_xlim(42.20, 42.45)
 ax[2].scatter(x=time2.lat, y=time2.lon, s=time2['count'], alpha = 0.2)
-ax[2].set_title('July 23, 6:00am - 10:00am')
+ax[2].set_title('July 25, 4:00pm - 8:00pm')
 ax[2].set_ylim(-71.21,-70.90)
 ax[2].set_xlim(42.20, 42.45)
 
@@ -162,3 +164,8 @@ For three of the visualizations you produced above, write a one or two paragraph
 1. A phenomenon that the data make visible (for example, how location services are utilized over the course of a day and why this might by).
 2. A shortcoming in the completeness of the data that becomes obvious when it is visualized.
 3. How this data could help us identify vulnerabilities related to climate change in the greater Boston area.
+
+
+### Solution
+
+As we can see from the results above, GSP pings are the highest during the middle of the day before trailing off at night. This makes sense, as traffic slows down after rush hour to a trickle in the middle of the night. However, beginning on July 24th, the amount of pings that are recorded each day drops dramatically. When looking at the same time period on July 9th compared July 23rd (during rush hour from 4-8pm), we see far fewer pings per observation, as shown by the smaller size of scatter points in the latter graph. However, this data could still be used to show when and where in the city traffic is highest and, if combined with flood plane projections, could identify high-traffic areas that are most likely to be impacted by rising sea levels.
