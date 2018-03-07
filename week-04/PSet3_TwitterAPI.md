@@ -26,7 +26,7 @@ One of the dangers of cleaning data is that you inadvertently delete data that i
 
 ### Step 1
 
-Using the Twitter REST API, collect at least 80,000 tweets. Do not specify a search term. Use a lat/lng of `42.359416,-71.093993` and a radius of `5mi`. Note that this will probably take 20-30 minutes to run.
+Using the Twitter REST API, collect at least 2,000 tweets. Do not specify a search term. Use a lat/lng of `42.359416,-71.093993` and a radius of `5mi`. This will take 1-2 minutes to run.
 
 ### Step 2
 
@@ -38,7 +38,7 @@ Create a scatterplot showing all of the tweets are that are geolocated (i.e., in
 
 ### Step 4
 
-Pick a search term (e.g., "housing", "climate", "flood") and collect tweets containing it. Use the same lat/lon and search radius for Boston as you used above. Dpending on the search term, you may find that there are relatively few available tweets.
+Pick a search term (e.g., "housing", "climate", "flood") and collect tweets containing it. Use the same lat/lon and search radius for Boston as you used above. Use a maximum of 2,000 tweets; depending on the search term, you may find that there are fewer than 2,000 tweets available.
 
 ### Step 5
 
