@@ -354,6 +354,7 @@ You saw above that we had a bunch of locations that were very similar. Here, we 
 
 ```python
 bos_list = tweets[tweets['location'].str.contains("Boston")]['location']
+bos_list
 tweets['location'].replace(bos_list, 'Boston, MA', inplace = True)
 
 tweets['location'].unique()

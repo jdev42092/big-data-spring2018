@@ -12,3 +12,6 @@ week-11/*
 week-03/data/skyhook_cleaned.csv
 week-03/data/skyhook_2017-07.csv
 **/*key*
+week-04/data/ps_celtics_tweets.json
+week-04/data/ps_tweets.json
+tweets.json
