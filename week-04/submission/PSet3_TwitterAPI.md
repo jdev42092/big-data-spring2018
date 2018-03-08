@@ -155,6 +155,7 @@ tweets.to_json('data/ps_tweets.json')
 df = pd.read_json('data/ps_tweets.json')
 df.head()
 df.shape
+df['lon'].notnull().sum()
 ```
 ### Step 2
 
@@ -165,10 +166,13 @@ Clean up the data so that variations of the same user-provided location name are
 ```python
 df['location'].unique()
 
-# Remove tweets without location
+# Remove duplicated tweets and those without location
+df[df.duplicated(subset = 'content', keep = False)]
+df.drop_duplicates(subset = 'content', keep = False, inplace = True)
+
 cleaned_tweets = df[df['location'] != ""]
 cleaned_tweets.shape[0]
-  # Down to 1648 records
+  # Down to 1083 records
 
 cleaned_tweets['location'].value_counts()
 # Keep Boston, Cambridge, Somerville
@@ -214,6 +218,7 @@ Create a scatterplot showing all of the tweets are that are geolocated (i.e., in
 
 ### Solution
 ```python
+
 geolocated = df[df['lon'].notnull() & df['lat'].notnull()]
 geolocated.shape
 
@@ -240,15 +245,15 @@ tweets = get_tweets(
   tweet_max = t_max,
   write = True,
   out_file = file_name,
-  search_term = 'celtics',
+  search_term = 'mit',
 )
 
-tweets.to_json('data/ps_celtics_tweets.json')
+tweets.to_json('data/ps_mit_tweets.json')
 
-df_celtics = pd.read_json('data/ps_celtics_tweets.json')
+df_mit = pd.read_json('data/ps_mit_tweets.json')
 
-df_celtics.head()
-df_celtics['lon'].notnull().sum()
+df_mit.head()
+df_mit['lon'].notnull().sum()
 ```
 
 
@@ -256,13 +261,83 @@ df_celtics['lon'].notnull().sum()
 
 Clean the search term data as with the previous data.
 
+```python
+df_mit['location'].unique()
+
+# Remove duplicated tweets and those without location
+df_mit[df_mit.duplicated(subset = 'content', keep = False)]
+df_mit.drop_duplicates(subset = 'content', keep = False, inplace = True)
+cleaned_mit_tweets = df_mit[df_mit['location'] != ""]
+cleaned_mit_tweets.shape[0]
+  # Down to 893 records
+
+cleaned_mit_tweets['location'].value_counts()
+# Keep Boston, Cambridge, Somerville
+def loc_find_and_clean(data, location, clean, casesens = False):
+  loc_list = data[data['location'].str.contains(location, case = casesens)]['location']
+  #print(loc_list.unique())
+  data['location'].replace(loc_list, clean, inplace = True)
+
+
+loc_find_and_clean(cleaned_mit_tweets,'Boston','Boston, MA')
+loc_find_and_clean(cleaned_mit_tweets,' UK','United Kingdom', casesens = True)
+loc_find_and_clean(cleaned_mit_tweets,'Cambridge','Cambridge, MA')
+loc_find_and_clean(cleaned_mit_tweets,'Somerville','Somerville, MA')
+loc_find_and_clean(cleaned_mit_tweets,'Quito','Quito, Ecuador')
+loc_find_and_clean(cleaned_mit_tweets,'Ecuador','Ecuador')
+loc_find_and_clean(cleaned_mit_tweets,'London','United Kingdom')
+loc_find_and_clean(cleaned_mit_tweets,'India','India')
+loc_find_and_clean(cleaned_mit_tweets,' NY','New York')
+
+loc_find_and_clean(cleaned_mit_tweets,' New York','New York', casesens = True)
+
+
+
+# Make every other record that refers to Massachusetts into 'Elsewhere in Massachusetts'
+massachusetts_list = cleaned_mit_tweets[cleaned_mit_tweets['location'].str.contains("Massachusetts", case = False)]['location']
+massachusetts_list
+cleaned_mit_tweets['location'].replace(massachusetts_list, 'Elsewhere in MA', inplace = True)
+ma_list = cleaned_mit_tweets[cleaned_mit_tweets['location'].str.contains(" MA")]['location']
+ma_list = [x for x in ma_list if x not in ['Boston, MA','Cambridge, MA']]
+ma_list
+cleaned_mit_tweets['location'].replace(ma_list, 'Elsewhere in MA', inplace = True)
+
+
+
+loc_find_and_clean(cleaned_mit_tweets,' DC','Washington, DC', casesens = True)
+loc_find_and_clean(cleaned_mit_tweets,' CA','California', casesens = True)
+loc_find_and_clean(cleaned_mit_tweets,'SF','California', casesens = True)
+loc_find_and_clean(cleaned_mit_tweets,'LA','California', casesens = True)
+cleaned_mit_tweets['location'].value_counts()
+
+# Move locations that show up less than 8 times into 'Other'
+loc_value_counts = cleaned_mit_tweets['location'].value_counts()
+cleaned_mit_tweets['location'].replace(loc_value_counts[loc_value_counts < 8].index,'Other', inplace = True)
+cleaned_mit_tweets['location'].value_counts()
+```
+
 ### Step 6
 
 Create a scatterplot showing all of the tweets that include your search term that are geolocated (i.e., include a latitude and longitude).
 
+```python
+
+geolocated_mit = df_mit[df_mit['lon'].notnull() & df_mit['lat'].notnull()]
+geolocated_mit.shape
+
+plt.scatter(geolocated_mit['lon'], geolocated_mit['lat'], alpha = 0.7, color = 'g')
+plt.title('Geolocated tweets about MIT')
+plt.show()
+```
+
 ### Step 7
 
 Export your scraped Twitter datasets (one with a search term, one without) to two CSV files. We will be checking this CSV file for duplicates and for consistent location names, so make sure you clean carefully!
+
+```python
+cleaned_tweets.to_csv('data/twitter_data.csv', sep=',', encoding='utf-8')
+cleaned_mit_tweets.to_csv('data/twitter_data_about_mit.csv', sep=',', encoding='utf-8')
+```
 
 ## Extra Credit Opportunity
 

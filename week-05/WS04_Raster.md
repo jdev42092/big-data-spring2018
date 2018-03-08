@@ -51,6 +51,7 @@ Once you've installed GDAL from KyngChaos, you'll have to add its location to yo
 ```python
 import sys
 sys.path.insert(0,'/Library/Frameworks/GDAL.framework/Versions/2.2/Python/3.6/site-packages')
+from osgeo import gdal
 ```
 
 You (should) only need to do this once.
@@ -85,7 +86,7 @@ import numpy as np
 import os
 %matplotlib inline
 ## make sure you set the DATA path to be to the folder where you downloaded the data at the beginning of class
-DATA = "/Users/ehuntley/Desktop/week-05/landsat"
+DATA = "/Users/jaydev/Desktop/DUSP/11.S941/ws04_materials"
 ```
 
 ## Calculating a Normalized Difference Vegetation Index
@@ -104,13 +105,16 @@ b5_raster = os.path.join(DATA, 'b5.tif')
 
 # Load in Red band
 red_data = gdal.Open(b4_raster)
+## Bands are the layers of a raster file- these all only have 1 band
 red_band = red_data.GetRasterBand(1)
+## Reading all pixel values as numpy array
 red = red_band.ReadAsArray()
-
+red.shape
 # Load in Near-infrasred band
 nir_data = gdal.Open(b5_raster)
 nir_band = nir_data.GetRasterBand(1)
 nir = nir_band.ReadAsArray()
+nir.shape
 ```
 
 What we see above is `gdal` proceeding in three steps. It opens a connection to the file, obtains the raster band (all the data we'll be working with only contains band 1), and reads in a `numpy` array so that we can process it. We can see that these are `numpy` arrays by checking their type.
@@ -149,7 +153,7 @@ Uh-oh. That doesn't look too promising... the problem is that we're trying to do
 red.dtype
 nir.dtype
 ```
-`uint16` refers to an unsigned 16-bit integer. So in addition to the fact that we're doing non-integer math with integer datatypes, we're also potentially creating negative values, which doesn't work so well with an unsigned data type. Good thing we can easily convert these `numpy` arrays using the `numpy` `.astype()` method.
+`uint16` refers to an unsigned (can't store positive and negative values) 16-bit integer. So in addition to the fact that we're doing non-integer math with integer datatypes, we're also potentially creating negative values, which doesn't work so well with an unsigned data type. Good thing we can easily convert these `numpy` arrays using the `numpy` `.astype()` method.
 
 ```python
 red = red.astype(np.float32)
@@ -199,7 +203,7 @@ We now need to read in some correction values stored in the Landsat metadata in 
 
 ```python
 # make this path the local path to your MTL.txt file that you downloaded at the start of the workshop
-meta_file = '/Users/ehuntley/Desktop/week-05/landsat/MTL.txt'
+meta_file = os.path.join(DATA, 'MTL.txt')
 
 with open(meta_file) as f:
     meta = f.readlines()
@@ -387,7 +391,7 @@ driver = gdal.GetDriverByName('GTiff')
 # so we can use the tirs_data size properties
 # Note that tirs_data = gdal.Open(b10_raster)
 # This is not the numpy array!
-new_dataset = driver.Create('/Users/ehuntley/Desktop/week-05/landsat/lst.tif',
+new_dataset = driver.Create('/Users/jaydev/Desktop/DUSP/11.S941/ws04_materials/lst.tif',
                     tirs_data.RasterXSize,
                     tirs_data.RasterYSize,
                     1,
