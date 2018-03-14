@@ -104,14 +104,14 @@ red_path = os.path.join(DATA, 'b4.tif')
 nir_path = os.path.join(DATA, 'b5.tif')
 
 # Load in Red band
-red_data = gdal.Open(b4_raster)
+red_data = gdal.Open(red_path)
 ## Bands are the layers of a raster file- these all only have 1 band
 red_band = red_data.GetRasterBand(1)
 ## Reading all pixel values as numpy array
 red = red_band.ReadAsArray()
 red.shape
 # Load in Near-infrasred band
-nir_data = gdal.Open(b5_raster)
+nir_data = gdal.Open(nir_path)
 nir_band = nir_data.GetRasterBand(1)
 nir = nir_band.ReadAsArray()
 nir.shape
