@@ -246,7 +246,10 @@ Use these functions to generate an Normalized Difference Vegetation Index and a 
 ```python
 ndvi, lst = lst_calc(data_dir)
 plt.imshow(ndvi, cmap='YlGn')
+plt.colorbar()
+
 plt.imshow(lst, cmap='YlGn')
+plt.colorbar()
 ```
 
 ## Remove Clouds
@@ -301,8 +304,9 @@ The reason you have to specify the `tirs_path` is that GDAL looks to another ras
 Once you've written these, you should compress each of them into a zip file - two separate ZIP files! This is to ensure that the files come in under Stellar's file submission size limit. Name sure they are named correctly e.g., `yourlastname_ndvi_imagerydate.tif`, where `yourlastname` is your last name and `imagerydate` is the date the imagery was captured reported in the format `YYYYMMDD`.
 
 ```python
+tirs_path = os.path.join(data_dir, 'LC08_L1TP_012031_20140809_20170304_01_T1_B10.TIF')
 ndvi_path = os.path.join(data_dir, 'dev_ndvi_20140809.tif')
-array2tif(ndvi_filter, ndvi_path, lst_filter)
-lst_path = os.path.join(data_dir, 'dev_lse_20140809.tif')
-array2tif(ndvi_filter, lst_path, lst_filter)
+array2tif(tirs_path, ndvi_path, ndvi_filter)
+lst_path = os.path.join(data_dir, 'dev_lst_20140809.tif')
+array2tif(tirs_path, lst_path, lst_filter)
 ```
