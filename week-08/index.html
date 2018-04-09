@@ -36,16 +36,16 @@
     console.log(d3.selectAll('rect'));
 
     function createVisualization() {
-      var w = 150;
-      var h = 175;
+      var w = 300;
+      var h = 350;
 
       // Get length of dataset
       var arrayLength = neigh311.length; // length of dataset
       var maxValue = d3.max(neigh311, function(d) {
         return +d.num_311;
       }); // get max value of our dataset
-      var x_axisLength = 100; // length of x-axis in our layout
-      var y_axisLength = 100; // length of y-axis in our layout
+      var x_axisLength = 200; // length of x-axis in our layout
+      var y_axisLength = 200; // length of y-axis in our layout
 
       var yScale = d3.scaleLinear()
         .domain([0, maxValue])
@@ -89,17 +89,17 @@
 
         svg.append('line')
           .attr("x1",30)
-          .attr("y1",75)
+          .attr("y1",100)
           .attr("x2",30)
-          .attr('y2',175)
+          .attr('y2',350)
           .attr('stroke-width',2)
           .attr('stroke','black');
 
         svg.append('line')
           .attr("x1",30)
-          .attr("y1",175)
-          .attr("x2",130)
-          .attr('y2',175)
+          .attr("y1",350)
+          .attr("x2",300)
+          .attr('y2',350)
           .attr('stroke-width',2)
           .attr('stroke','black');
 
