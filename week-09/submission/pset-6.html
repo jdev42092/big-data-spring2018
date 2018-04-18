@@ -3,31 +3,25 @@
 <head>
 	<title>Problem Set 6- Working with d3.js</title>
 	<meta charset="utf-8">
-	<script src="http://d3js.org/d3.v4.min.js" charset="utf-8"></script>
+	<script src="https://d3js.org/d3.v4.min.js" charset="utf-8"></script>
 	<style>
 	.axis .domain {
   	display: none;
-	}
-	.bar {
-  fill: steelblue;
-	}
-	.axis path {
-	  display: none;
 	}
 	</style>
 </head>
 <body>
 	<div>
 	<h1 style="font-family:helvetica">Total 311 Calls by Source in Each Boston Neighborhood</h1>
-	<svg width="960" height="600" id="chart1"></svg>
-	<p style="font-family:helvetica">Source: BOS:311 Data, Accessed from Analyze Boston </p>
+	<svg id = "svg1" width="960" height="600" ></svg>
 	<script>
 
-	var svg1 = d3.select("svg"),
-		margin = {top: 20, right: 20, bottom: 150, left: 40},
-		width = +svg1.attr("width") - margin.left - margin.right,
-		height = +svg1.attr("height") - margin.top - margin.bottom,
-		g = svg1.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+	var svg1 = d3.select("#svg1"),
+    margin = {top: 20, right: 20, bottom: 150, left: 40},
+    width = +svg1.attr("width") - margin.left - margin.right,
+    height = +svg1.attr("height") - margin.top - margin.bottom,
+    g = svg1.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
 
 	var x = d3.scaleBand()
 		.rangeRound([0, width])
@@ -113,15 +107,28 @@
 				.text(function(d) { return d; });
 	});
 	</script>
+	<p style="font-family:helvetica">Source: BOS:311 Data, Accessed from Analyze Boston </p>
 </div>
+
+<style>
+.bar {
+fill: steelblue;
+}
+.axis path {
+	display: none;
+}
+</style>
+<script src="https://d3js.org/d3.v4.min.js"></script>
 <div>
+	<h1 style="font-family:helvetica">Share of 311 Calls by Source in Each Boston Neighborhood</h1>
+	<svg id = "svg2" width="960" height="600" ></svg>
 	<script>
 
-	var svg1 = d3.select("#chart2"),
+	var svg2 = d3.select("#svg2"),
 	    margin = {top: 20, right: 120, bottom: 150, left: 40},
-	    width = +svg1.attr("width") - margin.left - margin.right,
-	    height = +svg1.attr("height") - margin.top - margin.bottom,
-	    g = svg1.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+	    width = +svg2.attr("width") - margin.left - margin.right,
+	    height = +svg2.attr("height") - margin.top - margin.bottom,
+	    g = svg2.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 	var x = d3.scaleBand()
 	    .rangeRound([0, width])
@@ -197,8 +204,6 @@
 	}
 
 	</script>
-	<h1 style="font-family:helvetica">Share of 311 Calls by Source in Each Boston Neighborhood</h1>
-	<svg width="960" height="600" id="chart2"></svg>
 	<p style="font-family:helvetica">Source: BOS:311 Data, Accessed from Analyze Boston </p>
 </div>
 </body>
