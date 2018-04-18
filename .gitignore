@@ -9,3 +9,4 @@ week-03/data/skyhook_2017-07.csv
 **/*key*
 week-04/data/*.json
 week-04/data/*.csv
+week-10/choropleth-d3/*
