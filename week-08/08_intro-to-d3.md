@@ -1105,7 +1105,7 @@ svg.selectAll( "rect" )
         return tooltip.style("visibility", "visible").text(d.neigh + ": " + d.num_311);
     })
     .on("mousemove", function(d){
-        return tooltip.style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px").text(d.neigh + ": " + d.num_311);
+        return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px").text(d.neigh + ": " + d.num_311);
     })
     .on("mouseout", function(d){
         return tooltip.style("visibility", "hidden");
