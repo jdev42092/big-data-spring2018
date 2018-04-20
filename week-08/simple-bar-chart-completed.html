@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>I'm Learning D3</title>
+	<!-- Load the D3 library here -->
+	<script src="https://d3js.org/d3.v4.js" charset="utf-8"></script>
+</head>
+<body>
+	<script>
+  // New dataset with More Numbers
+	var neigh311 = [];
+
+	d3.csv("data/neigh_311.csv", function(d) {
+	    return {
+	        neigh : d.neighborhood, // neighborhood name
+	        num_311 : +d.num_311 // force value of 311 calls to be number (+)
+	    };
+	}, function(error, rows) { // catch error if error, read rows
+	    neigh311 = rows; // set neigh311 equal to rows
+	    console.log(neigh311);
+	    createVisualization(); // call function to create chart
+	});
+
+	function createVisualization() {
+			// Width and height of SVG
+			var w = 150;
+			var h = 175;
+
+			// Get length of dataset
+			var arrayLength = neigh311.length; // length of dataset
+			var maxValue = d3.max(neigh311, function(d) { return +d.num_311;} ); // get maximum
+			var x_axisLength = 100; // length of x-axis in our layout
+			var y_axisLength = 100; // length of y-axis in our layout
+
+			// Use a scale for the height of the visualization
+			var yScale = d3.scaleLinear()
+					.domain([0, maxValue])
+					.range([0, y_axisLength]);
+
+			//Create SVG element
+			var svg = d3.select("body")
+					.append("svg")
+					.attr("width", w)
+					.attr("height", h);
+
+			var tooltip = d3.select("body")
+			    .append("div")
+			    .style("position", "absolute")
+			    .style("font-family", "'Open Sans', sans-serif")
+			    .style("font-size", "12px")
+			    .style("z-index", "10")
+			    .style("visibility", "hidden");
+
+			// Select and generate rectangle elements
+			svg.selectAll( "rect" )
+					.data( neigh311 )
+					.enter()
+					.append("rect")
+					.attr( "x", function(d,i){
+							return i * (x_axisLength/arrayLength) + 30; // Set x coordinate of rectangle to index of data value (i) * 25
+					})
+					.attr( "y", function(d){
+							return h - yScale(d.num_311); // Set y coordinate of rect using the y scale
+					})
+					.attr( "width", (x_axisLength/arrayLength) - 1)
+					.attr( "height", function(d){
+							return yScale(d.num_311); // Set height of using the scale
+					})
+					.attr( "fill", "steelblue")
+					.on("mouseover", function(d){
+							return tooltip.style("visibility", "visible").text(d.neigh + ": " + d.num_311);
+					})
+					.on("mousemove", function(d){
+							return tooltip.style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px").text(d.neigh + ": " + d.num_311);
+					})
+					.on("mouseout", function(d){
+							return tooltip.style("visibility", "hidden");
+					});
+
+			// Create y-axis
+			svg.append("line")
+					.attr("x1", 30)
+					.attr("y1", 75)
+					.attr("x2", 30)
+					.attr("y2", 175)
+					.attr("stroke-width", 2)
+					.attr("stroke", "black");
+
+			// Create x-axis
+			svg.append("line")
+					.attr("x1", 30)
+					.attr("y1", 175)
+					.attr("x2", 130)
+					.attr("y2", 175)
+					.attr("stroke-width", 2)
+					.attr("stroke", "black");
+
+			// y-axis label
+			svg.append("text")
+					.attr("class", "y label")
+					.attr("text-anchor", "end")
+					.text("No. of 311 Calls")
+					.attr("transform", "translate(20, 20) rotate(-90)")
+					.attr("font-size", "14")
+					.attr("font-family", "'Open Sans', sans-serif");
+	}; // end of function
+	</script>
+
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Mapping in D3</title>
+	<meta charset="utf-8">
+	<script src="http://d3js.org/d3.v4.min.js" charset="utf-8"></script>
+	<script src="data/boston_neighborhoods.json"></script>
+	<script src="data/boston_rodents.json"></script>
+	<style>
+		.incident {
+			fill: steelBlue;
+		}
+	</style>
+</head>
+<body>
+	<script>
+		var width = 700;
+		var height = 580;
+
+		var svg = d3.select("body")
+			.append("svg")
+			.attr("width", width)
+			.attr("height", height);
+
+		// To load map geometries into script ("g" refers to element type)
+		var g = svg.append("g");
+		var rodents = svg.append("g");
+
+		// Sets projection (Albers) for map
+		var albersProjection = d3.geoAlbers()
+			.scale(190000) 						// The smaller the number, the more zoomed out the scale (100 appropriate for world map)
+			.rotate( [71.057, 0])		// Sets where on rotational axis you are (longitude)
+			.center( [0, 42.313])			// Sets center at 42.313 degrees latitude
+			.translate( [width/2, height/2]); // locates map on webpage
+
+			// Calls map with given projection
+			var geoPath = d3.geoPath()
+				.projection( albersProjection);
+
+			g.selectAll("path")
+				.data(neighborhoods_json.features)
+				.enter()
+				.append("path")
+				.attr("fill","#ccc")
+				.attr("stroke","#333")
+				.attr("d", geoPath);		// This last line specifies coordinate system according to geoPath object using albersProjection
+
+			rodents.selectAll("path")
+				.data(rodents_json.features)
+				.enter()
+				.append("path")
+				.attr("fill","#900")
+				.attr("stroke","#999")
+				.attr("d",geoPath)
+				.attr("class","incident"); 		// Class that can be styled in css
+
+	</script>
+	<p><a href="submission/pset-6.html">Problem Set 6</a></p>
+</body>
+</html>

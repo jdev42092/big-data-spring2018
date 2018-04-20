@@ -1,10 +1,7 @@
 **/.DS_Store
 **/.ipynb_checkpoints/*
 week-04/**/twitter_keys.py
-**/__pycache__/*
-**/__pycache__/*
-week-09/*
-week-10/*
+**/__pycache__/*\
 week-11/*
 **/superceded/*
 week-03/data/skyhook_cleaned.csv
@@ -12,3 +9,4 @@ week-03/data/skyhook_2017-07.csv
 **/*key*
 week-04/data/*.json
 week-04/data/*.csv
+week-10/choropleth-d3/*

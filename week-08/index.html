@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <title>Learning D3</title>
+  <meta charset="utf-8">
+  <script src="https://d3js.org/d3.v4.js" charset="utf-8"></script>
+  <style>
+  text {
+      font-family: "Open Sans", sans-serif;
+      font-size: 12px;
+  }
+  </style>
+</head>
+<body>
+  <!-- 40, 90, 30, 60 -->
+  <!-- <svg width="160" height="180">
+    <rect x='30' width="20" height="40" fill='steelblue'></rect>
+    <rect x='55' width="20" height="90" fill='steelblue'></rect>
+    <rect x='80' width="20" height="30" fill='steelblue'></rect>
+    <rect x='105' width="20" height="60" fill='steelblue'></rect>
+  </svg> -->
+
+  <script>
+    var neigh311 = [];
+    d3.csv('neigh_311.csv', function(d) {
+      return {
+        neigh : d.neighborhood,
+        num_311 : +d.num_311  // + forces value of 311 calls to be number
+      };
+    }, function(error, rows) {
+      neigh311 = rows;
+      console.log(neigh311);
+      createVisualization();
+    });
+    console.log(d3.selectAll('rect'));
+
+    function createVisualization() {
+      var w = 300;
+      var h = 350;
+
+      // Get length of dataset
+      var arrayLength = neigh311.length; // length of dataset
+      var maxValue = d3.max(neigh311, function(d) {
+        return +d.num_311;
+      }); // get max value of our dataset
+      var x_axisLength = 200; // length of x-axis in our layout
+      var y_axisLength = 200; // length of y-axis in our layout
+
+      var yScale = d3.scaleLinear()
+        .domain([0, maxValue])
+        .range([0, y_axisLength]);
+       console.log(yScale);
+
+      // Selects first body tag, and append svg with width and height attributes
+      var svg = d3.select('body')
+        .append('svg')
+        .attr('width', w)
+        .attr('height', h);
+
+      // Select all rectangles within the svg object defined directly above
+      svg.selectAll('rect')
+        // bind rat data to rectangles
+        .data(neigh311)
+        // enter() creates additional data elements using given instructions
+        .enter()
+        .append('rect')
+        .attr("x",function (d,i) {
+          return 30 + (x_axisLength/arrayLength)*i;
+        })
+        .attr("y", function (d) {
+          return h - yScale(d.num_311);
+        })
+        .attr("width",(x_axisLength/arrayLength) - 1)
+        .attr('height',function (d) {
+          return d.num_311 * (y_axisLength/maxValue);
+        })
+        .attr('fill','steelblue')
+        .on("mouseover", function(d){
+          return tooltip.style('visibility','visible').text(d.neigh + ": " + d.num_311);
+        })
+        .on('mousemove',function(d){
+          return tooltip.style("top", (event.pageY-10) + "px").style("left",(event.pageX+10)+"px").text(d.neigh + ": " + d.num_311);
+        })
+        .on('mouseout', function(d) {
+          return tooltip.style("visibility", "hidden")
+        });
+
+
+        svg.append('line')
+          .attr("x1",30)
+          .attr("y1",100)
+          .attr("x2",30)
+          .attr('y2',350)
+          .attr('stroke-width',2)
+          .attr('stroke','black');
+
+        svg.append('line')
+          .attr("x1",30)
+          .attr("y1",350)
+          .attr("x2",300)
+          .attr('y2',350)
+          .attr('stroke-width',2)
+          .attr('stroke','black');
+
+        svg.append('text')
+          .attr('class','y-label')
+          .attr('text-anchor','end')
+          .text('No. of 311 Calls')
+          .attr('transform', 'translate(20,20) rotate(-90)')
+          .attr("font-size", "14")
+          .attr("font-family","'Open Sans', sans-serif");
+
+        var tooltip = d3.select('body')
+          .append("div")
+          .style('position', 'absolute')
+          .style('font-family',"'Open Sans', sans-serif")
+          .style("font-size","12px")
+          .style('z-index','10')
+          .style("visibility",'hidden');
+      };
+  </script>
+</body>
+</html>
