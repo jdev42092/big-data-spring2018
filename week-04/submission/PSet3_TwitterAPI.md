@@ -219,6 +219,13 @@ Create a scatterplot showing all of the tweets are that are geolocated (i.e., in
 ### Solution
 ```python
 
+'''grading note: bringing in csv to view scatterplot and look at cleaned data'''
+df = pd.read_csv('/Users/phoebe/Dropbox (MIT)/big-data/data/pset3_CSVs/Dev, Jay/36754725-twitter_data.csv')
+df.head()
+np.shape(df)
+df['location'].unique()
+df['lon'].unique()
+
 geolocated = df[df['lon'].notnull() & df['lat'].notnull()]
 geolocated.shape
 
@@ -321,6 +328,12 @@ cleaned_mit_tweets['location'].value_counts()
 Create a scatterplot showing all of the tweets that include your search term that are geolocated (i.e., include a latitude and longitude).
 
 ```python
+'''grading note: bringing in csv to view scatterplot and look at cleaned data'''
+df_mit = pd.read_csv('/Users/phoebe/Dropbox (MIT)/big-data/data/pset3_CSVs/Dev, Jay/36754715-twitter_data_about_mit.csv')
+df_mit.head()
+np.shape(df_mit)
+df_mit['location'].unique()
+df_mit['lon'].unique()
 
 geolocated_mit = df_mit[df_mit['lon'].notnull() & df_mit['lat'].notnull()]
 geolocated_mit.shape

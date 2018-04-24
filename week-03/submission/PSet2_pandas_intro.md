@@ -32,6 +32,9 @@ import matplotlib.pylab as plt
 
 df = pd.read_csv('week-03/data/skyhook_2017-07.csv', sep=',')
 
+# On PH computer
+df = pd.read_csv('/Users/phoebe/Dropbox (MIT)/big-data/data/skyhook_2017-07.csv', sep=',')
+
 # Create a new date column formatted as datetimes.
 df['date_new'] = pd.to_datetime(df['date'], format='%Y-%m-%d')
 
@@ -120,7 +123,6 @@ Create two more graphs. The first should be a **line plot** of **total activity*
 ts = df[['count']].groupby(df['timestamp']).sum()
 plt.plot(ts)
 
-
 pings_by_hour = df[['count']].groupby(df['hour']).sum()
 pings_by_hour.plot(kind = 'bar', color = 'g')
 ```
@@ -154,7 +156,20 @@ ax[2].scatter(x=time2.lat, y=time2.lon, s=time2['count'], alpha = 0.2)
 ax[2].set_title('July 25, 4:00pm - 8:00pm')
 ax[2].set_ylim(-71.21,-70.90)
 ax[2].set_xlim(42.20, 42.45)
-
+## Jay, nice job and nice job laying out the three charts. You have flipped lat and lon (lon is x and lat is y), so be careful with that! Also, you do not need to set your max and mins here for the axes. Matplotlib will do that automatically, and then you can always revise if you don't like it. But, here it just makes your code longer and is unnecessary. Lastly, I'd play around with the size of the dots so you can tease out patterns more easily. See below for an example:
+fig, ax = plt.subplots(1,3, figsize = (18, 6))
+ax[0].scatter(x=time0.lon, y=time0.lat, s=time0['count']/5, alpha = 0.2)
+ax[0].set_title('July 7, 1:00am - 5:00am')
+#ax[0].set_ylim(-71.21,-70.90)
+#ax[0].set_xlim(42.20, 42.45)
+ax[1].scatter(x=time1.lon, y=time1.lat, s=time1['count']/5, alpha = 0.2)
+ax[1].set_title('July 9, 4:00pm - 8:00pm')
+#ax[1].set_ylim(-71.21,-70.90)
+#ax[1].set_xlim(42.20, 42.45)
+ax[2].scatter(x=time2.lon, y=time2.lat, s=time2['count']/5, alpha = 0.2)
+ax[2].set_title('July 25, 4:00pm - 8:00pm')
+#ax[2].set_ylim(-71.21,-70.90)
+#ax[2].set_xlim(42.20, 42.45)
 ```
 
 ## Problem 6: Analyze Your (Very) Preliminary Findings
@@ -167,5 +182,5 @@ For three of the visualizations you produced above, write a one or two paragraph
 
 
 ### Solution
-
+#### Jay, make sure to think about the shortcomings in the data and how these might influence/bias what you are seeing. Also, look at maps and see where there might be interesting data points and hypothesize about what those could mean, such as the large dot on the northeastern part of the city. 
 As we can see from the results above, GSP pings are the highest during the middle of the day before trailing off at night. This makes sense, as traffic slows down after rush hour to a trickle in the middle of the night. However, beginning on July 24th, the amount of pings that are recorded each day drops dramatically. When looking at the same time period on July 9th compared July 23rd (during rush hour from 4-8pm), we see far fewer pings per observation, as shown by the smaller size of scatter points in the latter graph. However, this data could still be used to show when and where in the city traffic is highest and, if combined with flood plane projections, could identify high-traffic areas that are most likely to be impacted by rising sea levels.
