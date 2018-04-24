@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+
+.neighborhoods {
+  fill: none;
+}
+
+.states {
+  fill: none;
+  stroke: #fff;
+  stroke-linejoin: round;
+}
+
+</style>
+</head>
+<body>
+<svg width="960" height="600"></svg>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+<script src="https://d3js.org/topojson.v2.min.js"></script>
+<script>
+
+var svg = d3.select("svg"),
+    width = +svg.attr("width"),
+    height = +svg.attr("height");
+
+var boston_311_totals = d3.map();
+
+var albersProjection = d3.geoAlbers()
+    .scale( 190000 )
+    .rotate( [71.057,0] )
+    .center( [0, 42.313] )
+    .translate( [width/2,height/2] );
+
+var path = d3.geoPath()
+    .projection( albersProjection );
+
+var color = d3.scaleThreshold()
+    .domain(d3.range(0, 0.4,0.1))
+    .range(d3.schemeBlues[5]);
+
+d3.queue()
+    .defer(d3.json, "../data/boston_neigh.json")
+    .defer(d3.csv, "../data/boston_311_totals.csv")
+    .await(ready);
+
+
+function ready(error, neigh, bos311) {
+  if (error) throw error;
+
+  var tweetsbynhood = {}; // Create empty object for holding dataset
+
+  bos311.forEach(function(d) {
+    tweetsbynhood[d.Name] = 100*(+d.twit_count/+d.tot_count); // Create property for each ID, give it value from rate
+  });
+
+
+  svg.append("g")
+    .attr("class", "neighborhoods")
+    .selectAll("path")
+    .data(topojson.feature(neigh, neigh.objects.boston_neigh).features)
+    .enter().append("path")
+      .attr("fill", function(d) {
+        return color(tweetsbynhood[d.properties.Name]);
+       })
+      .attr("d", path)
+};
+
+</script>
+</body>
+</html>
