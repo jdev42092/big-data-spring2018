@@ -59,10 +59,47 @@
 		.attr("width", width)
 		.attr("height", height);
 
+	var x_map = d3.scaleLinear()
+	    .domain([0, 0.1, 0.2, 0.3, 0.4])
+	    .rangeRound([420, 480]);
+
 	// set color
 	var color = d3.scaleThreshold()
 	.domain([0, 0.1, 0.2, 0.3, 0.4])
 	.range(d3.schemeBlues[5]);
+
+	var g = map.append("g")
+			.attr("class", "key")
+			.attr("transform", "translate(0,40)");
+
+	g.selectAll("rect")
+		.data(color.range().map(function(d) {
+				d = color.invertExtent(d);
+				if (d[0] == null) d[0] = x_map.domain()[0];
+				if (d[1] == null) d[1] = x_map.domain()[1];
+				return d;
+			}))
+		.enter().append("rect")
+			.attr("height", 8)
+			.attr("x", function(d) { return x_map(d[0]); })
+			.attr("width", function(d) { return x_map(d[1]) - x_map(d[0]); })
+			.attr("fill", function(d) { return color(d[0]); });
+
+		g.append("text")
+				.attr("class", "caption")
+				.attr("x", x_map.range()[0])
+				.attr("y", -6)
+				.attr("fill", "#000")
+				.attr("text-anchor", "start")
+				.attr("font-weight", "bold")
+				.text("% of 311 Requests from Twitter");
+
+		g.call(d3.axisBottom(x_map)
+				.tickSize(13)
+				.tickFormat(function(x, i) { return i ? x : x + "%"; })
+				.tickValues(color.domain()))
+			.select(".domain")
+				.remove();
 
 	// queue up the datasets, run 'ready' when loaded
 	d3.queue()
@@ -76,12 +113,12 @@
 
 	  var calls_pct = {}; // Create empty object for holding dataset
 		var neighById = {};
+		var citizenconnect = {};
 
 		calls.forEach(function(d) {
  		 // console.log((d.twit_count / d.tot_count) * 100)
-		 console.log(d.Name, d.cc_count)
  		 calls_pct[d.id] = +((d.twit_count / d.tot_count) * 100); // Create property for each ID, give it value from rate
-		 neighById[d.id] = d.Name;
+		 neighById[d.id] = d.class;
 	 	});
 	  // create and style states
 	  map.append("g")
@@ -99,7 +136,6 @@
 
 				//This part adds the class "hover" to the state and its matching rectangle in the chart
 				.on("mouseover", function(d) {
-					console.log(neighById)
 					d3.selectAll("." + neighById[d.properties.OBJECTID]).classed("hover",true);
 				})
 				.on("mouseout", function(d) {
@@ -107,104 +143,108 @@
 					d3.selectAll("." + neighById[d.properties.OBJECTID]).classed("hover", false);
 				});
 
-		// STACKED BAR CHART WITH HOVER
-    //
-		// var m = {top: 20, right: 100, bottom: 30, left: 100},
-		// 	width = +map.attr("width") - m.left - m.right,
-		// 	height = +map.attr("height") - m.top - m.bottom,
-		// 	g = chart.append("g").attr("transform", "translate(" + m.left + "," + m.top + ")");
-    //
-		// // set x scale
-		// var x = d3.scaleBand()
-		// 	.rangeRound([0, width])
-		// 	.paddingInner(0.05)
-		// 	.align(0.1);
-    //
-		// // set y scale
-		// var y = d3.scaleLinear()
-		// 	.rangeRound([height, 0]);
-    //
-		// // set the colors
-		// var z = d3.scaleOrdinal()
-		// 	.range(["#2166ac","#b2182b","#aaa"]);
-    //
-    //
-	  // // var keys = results.columns.slice(1);
-		// var keys = ["Democrat", "Republican", "Other"];
-    //
-	  // results.sort(function(a, b) { return b.total - a.total; });
-	  // x.domain(results.map(function(d) { return d.State; }));
-	  // y.domain([0, d3.max(results, function(d) { return +d.total; })]).nice();
-	  // z.domain(keys);
-    //
-		// // console.log(d3.stack().keys(keys)(results));
-	  // g.append("g")
-		// 	.selectAll("g")
-		// 	.data(d3.stack().keys(keys)(results))
-		// 	.enter().append("g")
-		// 	  .attr("fill", function(d) { return z(d.key); })
-		// 		.selectAll("rect")
-		// 	.data(function(d) { return d; })
-		// 	.enter().append("rect")
-		// 	  .attr("x", function(d) { return x(d.data.State); })
-		// 	  .attr("y", function(d) { return y(d[1]); })
-		// 	  .attr("height", function(d) { return y(d[0]) - y(d[1]); })
-		// 	  .attr("width", x.bandwidth())
-		// 	  //The next line assigns each rectangle a class that matches the state names above: AK, AR, etc.
-		// 	  .attr("class", function (d) { return d.data.State;})
-		// 	  //The mouseover functions work just like the ones in the map, they add "hover" class to all matching elements
-		// 	.on("mouseover", function(d) {
-		// 			//d3.select(this).classed("hover",true);
-		// 			d3.selectAll("." + d.data.State).classed("hover",true);
-		// 		})
-		// 	.on("mouseout", function(d) {
-		// 		//d3.select(this).classed("hover",false);
-		// 		d3.selectAll("." + d.data.State).classed("hover", false);
-		// 	});
-    //
-	  // g.append("g")
-		//   .attr("class", "axis")
-		//   .attr("transform", "translate(0," + height + ")")
-		//   .call(d3.axisBottom(x))
-    //   .selectAll("text")
-    //     .style("text-anchor", "end")
-    //     .attr("dx", "-.8em")
-    //     .attr("dy", ".15em")
-    //     .attr("transform", "rotate(-65)");
-    //
-	  // g.append("g")
-		//   .attr("class", "axis")
-		//   .call(d3.axisLeft(y).ticks(null, "s"))
-		// .append("text")
-		//   .attr("x", 2)
-		//   .attr("y", y(y.ticks().pop()) + 0.5)
-		//   .attr("dy", "0.32em")
-		//   .attr("fill", "#000")
-		//   .attr("font-weight", "bold")
-		//   .attr("text-anchor", "start");
-    //
-	  // var legend = g.append("g")
-		//   .attr("font-family", "sans-serif")
-		//   .attr("font-size", 10)
-		//   .attr("text-anchor", "end")
-		// .selectAll("g")
-		// .data(keys.slice().reverse())
-		// .enter().append("g")
-		//   .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
-    //
-	  // legend.append("rect")
-		//   .attr("x", width - 19)
-		//   .attr("width", 19)
-		//   .attr("height", 19)
-		//   .attr("fill", z);
-    //
-	  // legend.append("text")
-		//   .attr("x", width - 24)
-		//   .attr("y", 9.5)
-		//   .attr("dy", "0.32em")
-		//   .text(function(d) { return d; });
 
-	}
+		//STACKED BAR CHART WITH HOVER
+
+		var m = {top: 30, right: 150, bottom: 120, left: 100},
+			width = +map.attr("width") - m.left - m.right,
+			height = +map.attr("height") - m.top - m.bottom,
+			g = chart.append("g").attr("transform", "translate(" + m.left + "," + m.top + ")");
+
+		// set x scale
+		var x = d3.scaleBand()
+			.rangeRound([0, width])
+			.paddingInner(0.05)
+			.align(0.1);
+
+		// set y scale
+		var y = d3.scaleLinear()
+			.rangeRound([height, 0]);
+
+		// set the colors
+		var z = d3.scaleOrdinal()
+			.range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+
+	  // var keys = results.columns.slice(1);
+		var keys = calls.columns.slice(3,9);
+		console.log(keys)
+
+	  calls.sort(function(a, b) { return b.tot_count - a.tot_count; });
+	  x.domain(calls.map(function(d) { return d.class; }));
+	  y.domain([0, d3.max(calls, function(d) { return +d.tot_count; })]).nice();
+	  z.domain(keys);
+
+		// console.log(d3.stack().keys(keys)(results));
+	  g.append("g")
+			.selectAll("g")
+			.data(d3.stack().keys(keys)(calls))
+			.enter().append("g")
+			  .attr("fill", function(d) { return z(d.key); })
+				.selectAll("rect")
+			.data(function(d) { return d; })
+			.enter().append("rect")
+			  .attr("x", function(d) { return x(d.data.class); })
+			  .attr("y", function(d) { return y(d[1]); })
+			  .attr("height", function(d) { return y(d[0]) - y(d[1]); })
+			  .attr("width", x.bandwidth())
+			  //The next line assigns each rectangle a class that matches the state names above: AK, AR, etc.
+			  .attr("class", function(d) { return d.data.class; })
+			  //The mouseover functions work just like the ones in the map, they add "hover" class to all matching elements
+			.on("mouseover", function(d) {
+					//d3.select(this).classed("hover",true);
+					d3.selectAll("." + d.data.class).classed("hover",true);
+				})
+			.on("mouseout", function(d) {
+				//d3.select(this).classed("hover",false);
+				d3.selectAll("." + d.data.class).classed("hover", false);
+			});
+
+		x.domain(calls.map(function(d) { return d.Name; }));
+
+	  g.append("g")
+		  .attr("class", "axis")
+		  .attr("transform", "translate(0," + height + ")")
+		  .call(d3.axisBottom(x))
+      .selectAll("text")
+        .style("text-anchor", "end")
+        .attr("dx", "-.8em")
+        .attr("dy", ".15em")
+        .attr("transform", "rotate(-65)");
+
+	  g.append("g")
+		  .attr("class", "axis")
+		  .call(d3.axisLeft(y).ticks(null, "s"))
+		.append("text")
+		  .attr("x", 2)
+		  .attr("y", y(y.ticks().pop()) + 0.5)
+		  .attr("dy", "0.32em")
+		  .attr("fill", "#000")
+		  .attr("font-weight", "bold")
+		  .attr("text-anchor", "start")
+			.text("Total 311 Calls");
+
+	  var legend = g.append("g")
+		  .attr("font-family", "sans-serif")
+		  .attr("font-size", 10)
+		  .attr("text-anchor", "end")
+		.selectAll("g")
+		.data(['Citizens Connect App','City Worker App','Constituent Call','Employee Generated','Twitter','Self Service'].reverse())
+		.enter().append("g")
+		  .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+	  legend.append("rect")
+		  .attr("x", width - 19)
+		  .attr("width", 19)
+		  .attr("height", 19)
+		  .attr("fill", z);
+
+	  legend.append("text")
+		  .attr("x", width - 24)
+		  .attr("y", 9.5)
+		  .attr("dy", "0.32em")
+		  .text(function(d) { return d; });
+
+	};
 
 
 </script>
